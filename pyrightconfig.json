@@ -1,6 +1,6 @@
 {
   "include": ["pipeline"],
-  "exclude": ["**/__pycache__"],
+  "exclude": ["**/__pycache__", "**/node_modules", "**/.*", "**/*.egg-info", "**/.venv"],
   "reportMissingImports": false,
   "reportMissingModuleSource": false,
   "pythonVersion": "3.14",

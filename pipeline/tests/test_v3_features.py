@@ -295,10 +295,8 @@ class TestCorrelationIds:
     def test_state_has_correlation_id(self):
         from pipeline.core.models import RepoEvolutionState
         state = RepoEvolutionState(
-            repo_url="https://github.com/test/repo",
             repo_name="test-repo",
             github_url="https://github.com/test/repo",
-            category="utility",
         )
         assert state.correlation_id
         assert len(state.correlation_id) == 12
@@ -308,10 +306,8 @@ class TestCorrelationIds:
         ids = set()
         for _ in range(100):
             state = RepoEvolutionState(
-                repo_url="https://github.com/test/repo",
                 repo_name="test-repo",
                 github_url="https://github.com/test/repo",
-                category="utility",
             )
             ids.add(state.correlation_id)
         assert len(ids) == 100  # All unique
