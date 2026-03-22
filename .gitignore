@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+repo_evolution_pipeline.egg-info/
+
+# Local environment
+.env
+
+# Pipeline runtime artifacts
+data/checkpoint-*.json
+data/evolution-status.json
+data/logs/

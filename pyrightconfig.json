@@ -1,0 +1,13 @@
+{
+  "include": ["pipeline"],
+  "exclude": ["**/__pycache__"],
+  "reportMissingImports": false,
+  "reportMissingModuleSource": false,
+  "pythonVersion": "3.14",
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "extraPaths": ["."]
+    }
+  ]
+}

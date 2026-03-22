@@ -1,0 +1,50 @@
+# ── Repo Evolution Pipeline v2.0 — Dependencies ──────────────────────────
+
+# Core
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# LLM
+langchain-anthropic>=0.3.0
+langchain-core>=0.3.0
+
+# GitHub / GitLab
+PyGithub>=2.1.0
+python-gitlab>=4.2.0
+requests>=2.31.0
+
+# Async
+aiohttp>=3.9.0
+asyncio-throttle>=1.0.0
+
+# Templates
+jinja2>=3.1.0
+
+# CLI & Display
+rich>=13.7.0
+click>=8.1.0
+typer>=0.12.0
+
+# API (Phase 3)
+fastapi>=0.109.0
+uvicorn>=0.27.0
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+
+# Code Quality
+ruff>=0.4.0
+mypy>=1.10.0
+pyright>=1.1.0
+
+# Optional: LangGraph (if using graph-based pipeline)
+# langgraph>=0.2.0
+
+# Optional: Supabase (for state persistence)
+# supabase>=2.0.0
+
+# Optional: Redis (for job queue)
+# redis>=5.0.0

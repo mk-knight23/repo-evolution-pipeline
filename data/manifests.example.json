@@ -1,0 +1,13 @@
+[
+  {
+    "name": "demo-repository",
+    "github_url": "https://github.com/owner/demo-repository",
+    "description": "Example repository manifest for local pipeline runs",
+    "category": "webapp",
+    "stars": 100,
+    "last_updated": "2026-03-23T00:00:00Z",
+    "language": "TypeScript",
+    "topics": ["example", "demo", "pipeline"],
+    "commit_sha": "main"
+  }
+]

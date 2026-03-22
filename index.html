@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Repo Evolution Pipeline - GitHub Repository Guide</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --bg-strong: #e9dfcf;
+      --panel: rgba(255, 251, 244, 0.92);
+      --panel-strong: #fffaf0;
+      --ink: #1f1d19;
+      --muted: #645c51;
+      --line: rgba(52, 43, 32, 0.14);
+      --accent: #0b6e4f;
+      --accent-2: #b4572f;
+      --accent-3: #174c7a;
+      --warn: #9b6b00;
+      --danger: #8f2d2d;
+      --shadow: 0 18px 60px rgba(48, 36, 20, 0.12);
+      --radius: 22px;
+      --mono: "SFMono-Regular", "Menlo", "Monaco", "Cascadia Mono", monospace;
+      --sans: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+      --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--sans);
+      background:
+        radial-gradient(circle at top left, rgba(180, 87, 47, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(11, 110, 79, 0.11), transparent 24%),
+        linear-gradient(180deg, #fbf7f0 0%, var(--bg) 52%, #efe5d7 100%);
+      line-height: 1.5;
+    }
+
+    .grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(52, 43, 32, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(52, 43, 32, 0.03) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.65), transparent 92%);
+    }
+
+    .page {
+      width: min(1220px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 64px;
+      position: relative;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-main {
+      padding: 34px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(11, 110, 79, 0.14), transparent 68%);
+      border-radius: 50%;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(23, 76, 122, 0.08);
+      border: 1px solid rgba(23, 76, 122, 0.13);
+      color: var(--accent-3);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.08;
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.4rem, 5vw, 4.4rem);
+      margin-top: 18px;
+      max-width: 10ch;
+    }
+
+    .hero-copy {
+      margin-top: 18px;
+      max-width: 68ch;
+      color: var(--muted);
+      font-size: 1.02rem;
+    }
+
+    .hero-stats {
+      display: grid;
+      gap: 14px;
+      padding: 22px;
+    }
+
+    .stat-box {
+      padding: 18px 18px 16px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,247,236,0.92));
+      border: 1px solid var(--line);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .stat-note {
+      margin-top: 8px;
+      font-size: 0.94rem;
+      color: var(--muted);
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 24px;
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      margin-bottom: 14px;
+    }
+
+    .lead {
+      font-size: 1.08rem;
+      color: var(--muted);
+      max-width: 78ch;
+      margin-bottom: 20px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .flow-step {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.62);
+      min-height: 188px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
+
+    .flow-step::after {
+      content: "→";
+      position: absolute;
+      right: -10px;
+      top: 18px;
+      font-size: 1.2rem;
+      color: var(--accent-2);
+    }
+
+    .flow-step:last-child::after { content: ""; }
+
+    .step-no {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      background: var(--ink);
+      color: #fff;
+      font-size: 0.95rem;
+    }
+
+    .step-title {
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .step-text {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .step-path {
+      margin-top: auto;
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      color: var(--accent-3);
+      word-break: break-word;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .mini-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.66);
+      padding: 18px;
+    }
+
+    .mini-card h3 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+
+    .mini-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .tag {
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.76);
+      font-size: 0.82rem;
+      color: var(--ink);
+    }
+
+    .artifact-grid,
+    .feature-grid,
+    .endpoint-grid,
+    .note-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .artifact,
+    .feature,
+    .endpoint,
+    .note {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.64);
+      border: 1px solid var(--line);
+    }
+
+    .artifact code,
+    .endpoint code,
+    .note code,
+    .mini-card code,
+    .line code,
+    .step-path,
+    .codeish {
+      font-family: var(--mono);
+    }
+
+    .artifact h3,
+    .feature h3,
+    .endpoint h3,
+    .note h3 {
+      font-size: 0.98rem;
+      margin-bottom: 9px;
+    }
+
+    .artifact p,
+    .feature p,
+    .endpoint p,
+    .note p,
+    .artifact li,
+    .feature li,
+    .endpoint li,
+    .note li {
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .artifact ul,
+    .feature ul,
+    .endpoint ul,
+    .note ul {
+      margin: 12px 0 0;
+      padding-left: 18px;
+    }
+
+    .code-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .line {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(31, 29, 25, 0.05);
+      border: 1px solid rgba(31, 29, 25, 0.08);
+      font-size: 0.9rem;
+      color: var(--ink);
+    }
+
+    .callout {
+      padding: 18px 20px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255, 249, 240, 0.9), rgba(245, 237, 224, 0.9));
+      margin-top: 18px;
+    }
+
+    .callout strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.94rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+    }
+
+    .footer-note {
+      margin-top: 22px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 1100px) {
+      .hero,
+      .two-col,
+      .artifact-grid,
+      .feature-grid,
+      .endpoint-grid,
+      .note-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .flow-step::after {
+        display: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        width: min(100vw - 18px, 1220px);
+        padding-top: 14px;
+      }
+
+      .hero-main,
+      .hero-stats,
+      .section {
+        padding: 18px;
+      }
+
+      .flow,
+      .artifact-grid,
+      .feature-grid,
+      .endpoint-grid,
+      .note-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid"></div>
+  <main class="page">
+    <section class="hero">
+      <article class="hero-main card">
+        <div class="eyebrow">GitHub Repository Guide</div>
+        <h1>Repo Evolution Pipeline</h1>
+        <p class="hero-copy">
+          This project is an AI-driven multi-agent orchestration system that takes GitHub repository input, analyzes source intent,
+          designs a mobile architecture, generates a mobile codebase, verifies output with real commands, runs quality gates,
+          and optionally publishes to GitLab. This page mirrors the GitHub README and documents what is implemented today.
+        </p>
+        <div class="tag-row">
+          <span class="tag">GitHub-Ready Documentation</span>
+          <span class="tag">CLI + FastAPI Entry Points</span>
+          <span class="tag">Stateful Per-Repo Orchestration</span>
+          <span class="tag">Generate → Verify → Repair</span>
+          <span class="tag">Quality + Security Gates</span>
+          <span class="tag">GitLab Publication</span>
+          <span class="tag">Diagnostics + Run Events</span>
+        </div>
+      </article>
+
+      <aside class="hero-stats card">
+        <div class="stat-box">
+          <div class="stat-label">Default Stage Chain</div>
+          <div class="stat-value">7 stages</div>
+          <div class="stat-note">Cloning, analyzing, architecting, generating, verifying, quality check, pushing.</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Generated Targets</div>
+          <div class="stat-value">Expo / RN</div>
+          <div class="stat-note">The implemented mobile frameworks are Expo and React Native.</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Durability Features</div>
+          <div class="stat-value">Checkpointed</div>
+          <div class="stat-note">Atomic versioned checkpoints, stage journal, clone cache, push dedup, run diagnostics.</div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section card">
+      <div class="section-title">GitHub Starter Guide</div>
+      <p class="lead">Use this section like a repository landing page: start quickly, understand the agent teams, and move from local development to production deployment with the linked documentation set.</p>
+      <div class="endpoint-grid">
+        <article class="endpoint">
+          <h3>Start Here</h3>
+          <ul>
+            <li><a href="README.md">README.md</a></li>
+            <li><a href="docs/README.md">Documentation Index</a></li>
+            <li><a href="docs/getting-started/local-setup.md">Local Setup</a></li>
+            <li><a href="docs/getting-started/quickstart-cli.md">CLI Quickstart</a></li>
+            <li><a href="docs/getting-started/quickstart-api.md">API Quickstart</a></li>
+          </ul>
+        </article>
+        <article class="endpoint">
+          <h3>Cloud And Operations</h3>
+          <ul>
+            <li><a href="docs/deployment/local-dev.md">Local Development Deployment</a></li>
+            <li><a href="docs/deployment/production.md">Production Deployment Guidance</a></li>
+            <li><a href="docs/operations/runbook.md">Operations Runbook</a></li>
+            <li><a href="docs/operations/quality-gates-and-verification.md">Quality and Verification</a></li>
+            <li><a href="docs/api/endpoints.md">API Endpoint Reference</a></li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="artifact-grid" style="margin-top: 16px;">
+        <article class="artifact">
+          <h3>Agent Teams And Skills</h3>
+          <p>The working model is team-oriented and stage-specialized: scanner, analyzer, architect, generator, verification, repair, quality, and push teams each own a skill domain with clear input and output contracts.</p>
+          <div class="code-list">
+            <div class="line"><a href="docs/architecture/agent-team-model.md">Open Agent Team Model</a></div>
+          </div>
+        </article>
+        <article class="artifact">
+          <h3>How The Pipeline Works</h3>
+          <p>The canonical implementation flow is Scanner → Analyzer → Architect → CodeGen → Verifier → Quality Gates → Pusher, with checkpoint durability, run diagnostics, and optional repair loops between generation and release.</p>
+          <div class="code-list">
+            <div class="line"><a href="docs/architecture/pipeline-overview.md">Open Pipeline Overview</a></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section card">
+      <div class="section-title">End-to-End Flow</div>
+      <p class="lead">The orchestrator runs each repository through the same stateful pipeline. Each stage updates a <span class="codeish">RepoEvolutionState</span>, writes checkpoints, emits run events, and can resume from saved work.</p>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="step-no">1</div>
+          <div class="step-title">Input</div>
+          <div class="step-text">A batch of <span class="codeish">RepoManifest</span> objects or one repo arrives from the CLI or API. The manifest carries name, URL, category, stars, metadata, and optional commit SHA.</div>
+          <div class="step-path">pipeline/__main__.py<br>pipeline/api/server.py</div>
+        </div>
+        <div class="flow-step">
+          <div class="step-no">2</div>
+          <div class="step-title">Clone</div>
+          <div class="step-text">The source repo is cloned or fetched from GitHub API, filtered into a bounded file set, and optionally served from a commit-aware cache when the same SHA was already processed.</div>
+          <div class="step-path">pipeline/agents/scanner.py</div>
+        </div>
+        <div class="flow-step">
+          <div class="step-no">3</div>
+          <div class="step-title">Analyze</div>
+          <div class="step-text">If source files exist, the LLM performs deep analysis. Otherwise, the system falls back to a design brief generated from repo metadata only.</div>
+          <div class="step-path">pipeline/agents/analyzer.py</div>
+        </div>
+        <div class="flow-step">
+          <div class="step-no">4</div>
+          <div class="step-title">Architect</div>
+          <div class="step-text">Framework, navigation, dependencies, and screen list are selected using analysis data plus category heuristics. Complex webapps bias toward React Native; many categories default to Expo.</div>
+          <div class="step-path">pipeline/agents/architect.py</div>
+        </div>
+        <div class="flow-step">
+          <div class="step-no">5</div>
+          <div class="step-title">Generate</div>
+          <div class="step-text">The system generates a full mobile project file map: config, screens, navigation, theme, store, API layer, CI, README, and architecture docs.</div>
+          <div class="step-path">pipeline/agents/codegen.py</div>
+        </div>
+        <div class="flow-step">
+          <div class="step-no">6</div>
+          <div class="step-title">Verify</div>
+          <div class="step-text">Generated files are materialized to disk and checked with install, lint, type-check, test, and optional web-export commands. Failures are categorized for repair.</div>
+          <div class="step-path">pipeline/quality/verifier.py</div>
+        </div>
+        <div class="flow-step">
+          <div class="step-no">7</div>
+          <div class="step-title">Gate + Push</div>
+          <div class="step-text">Quality gates produce a score and GitLab push happens only if the configured rules allow it. Pushes are deduplicated using content-based idempotency keys.</div>
+          <div class="step-path">pipeline/quality/gates.py<br>pipeline/agents/pusher.py</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section card">
+      <div class="section-title">Exact Runtime Working</div>
+      <div class="two-col">
+        <div class="stack">
+          <div class="mini-card">
+            <h3>How a Batch Run Actually Starts</h3>
+            <p>The CLI or API constructs manifests, then creates a <span class="codeish">PipelineOrchestrator</span>. For batch runs, the orchestrator sorts manifests by stars and last-updated time, applies a concurrency semaphore, and processes the input in batches.</p>
+            <div class="code-list">
+              <div class="line"><code>python -m pipeline run --manifests data/manifests.example.json</code></div>
+              <div class="line"><code>POST /run</code> with manifests, optional batch size, optional concurrency, optional enabled stages</div>
+            </div>
+          </div>
+          <div class="mini-card">
+            <h3>How a Single Run Actually Starts</h3>
+            <p>The system maps the string category to <span class="codeish">RepoCategory</span>, builds a one-repo manifest, allocates a run id, and passes that into the orchestrator. Single runs now participate in the diagnostics system because they emit a real run id.</p>
+          </div>
+          <div class="mini-card">
+            <h3>What the State Contains</h3>
+            <p>Each repo has a <span class="codeish">RepoEvolutionState</span> carrying source files, deep analysis or design brief, mobile architecture, generated files, generation result, verification report, warnings, errors, timing, correlation id, checkpoint schema version, and stage history.</p>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="mini-card">
+            <h3>How Resume Works Now</h3>
+            <p>The system first tries to load a checkpoint from the data directory. If the checkpoint is already completed, the repo is skipped and the monitor is updated. Otherwise, resume logic prefers explicit stage-history records; only when those records do not exist does it fall back to heuristic field-based skips.</p>
+          </div>
+          <div class="mini-card">
+            <h3>How Reliability Was Strengthened</h3>
+            <p>Checkpoints are written atomically using temp file replacement. Each checkpoint is schema-versioned. Clone work is cached per commit SHA. Pushes use an idempotency key derived from manifest, architecture, and generated content so duplicate reruns do not republish the same result.</p>
+          </div>
+          <div class="mini-card">
+            <h3>How Events and Diagnostics Work</h3>
+            <p>Each stage emits run-aware events that include run id, correlation id, repo, stage, attempt, and duration when available. The diagnostics endpoint combines event history, status, and final report for a run into one response.</p>
+            <div class="code-list">
+              <div class="line"><code>GET /report/{run_id}</code></div>
+              <div class="line"><code>GET /diagnostics/{run_id}</code></div>
+              <div class="line"><code>GET /status</code></div>
+              <div class="line"><code>GET /metrics</code></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section card">
+      <div class="section-title">Stage-by-Stage Working</div>
+      <div class="artifact-grid">
+        <article class="artifact">
+          <h3>Cloning</h3>
+          <p>The scanner attempts a shallow git clone first. If clone fails, it falls back to GitHub REST API tree/content fetches. Files are filtered by extension, max size, max file count, and total character budget. Priority is given to package/config/readme files before broader source traversal.</p>
+          <ul>
+            <li>Commit-aware clone cache only activates when <code>commit_sha</code> exists.</li>
+            <li>Assets are inlined as base64 data URLs for analysis.</li>
+            <li>Output becomes <code>state.source_files</code>.</li>
+          </ul>
+        </article>
+        <article class="artifact">
+          <h3>Analyzing</h3>
+          <p>The analyzer builds a condensed source summary and asks the LLM for framework, routes, components, state model, API calls, design theme, readiness score, and mobile translation notes. If no source files were extracted, it creates a metadata-driven design brief instead.</p>
+          <ul>
+            <li>Deep path: <code>analyze_repo_deep()</code></li>
+            <li>Fallback path: <code>analyze_repo_shallow()</code></li>
+            <li>Output becomes <code>state.deep_analysis</code> or <code>state.design_brief</code>.</li>
+          </ul>
+        </article>
+        <article class="artifact">
+          <h3>Architecting</h3>
+          <p>The architect converts analysis into a mobile execution plan. It chooses Expo or React Native, sets navigation type, constructs screens, assigns state management, chooses the navigation library, and derives dependency lists.</p>
+          <ul>
+            <li>High complexity webapps can switch to React Native.</li>
+            <li>Screen list may come from routes, design brief, or fallback heuristics.</li>
+            <li>Output becomes <code>state.architecture</code>.</li>
+          </ul>
+        </article>
+        <article class="artifact">
+          <h3>Generating</h3>
+          <p>The code generator creates a mobile file map in memory. It emits package configuration, TypeScript config, Expo config, navigation files, screens, shared components, theme files, API service, state store, README, ARCHITECTURE doc, and CI config.</p>
+          <ul>
+            <li>It uses a project context manager to supply source-aware context to code generation.</li>
+            <li>It creates both machine-facing files and human-facing documentation.</li>
+            <li>Output becomes <code>state.generated_files</code>.</li>
+          </ul>
+        </article>
+        <article class="artifact">
+          <h3>Verifying</h3>
+          <p>The verifier writes the generated file map into a temp project directory and runs actual package-manager and build commands. It captures stdout, stderr, exit code, duration, failure category, summary, and relevant file hints.</p>
+          <ul>
+            <li>Checks include install, lint, type-check, test, and optional web export.</li>
+            <li>Failed reports can keep the temp directory in non-strict mode.</li>
+            <li>Output becomes <code>state.verification_report</code>.</li>
+          </ul>
+        </article>
+        <article class="artifact">
+          <h3>Repairing</h3>
+          <p>If verification fails and repair is enabled, the repair agent asks the LLM for a minimal edit plan. The prompt now includes failure category, summary, and relevant files so repairs are narrower and less likely to rewrite unrelated screens.</p>
+          <ul>
+            <li>Repair applies create/update/delete edits to the in-memory file map.</li>
+            <li>The verifier is then re-run up to the configured repair attempt limit.</li>
+            <li>This is the generate → verify → repair loop implemented in the repo today.</li>
+          </ul>
+        </article>
+        <article class="artifact">
+          <h3>Quality Check</h3>
+          <p>Quality gates inspect the generated output for structure, config validity, minimum screens, navigation presence, CI file, README, architecture docs, secret leaks, typing, accessibility, offline support, error handling, placeholder content, design tokens, SCA, dependency freshness, performance hints, and i18n readiness.</p>
+          <ul>
+            <li>The quality score is computed from passed and warning gates.</li>
+            <li>Generation result stores files, lines, build status, gates, and score.</li>
+            <li>Output becomes <code>state.generation_result</code>.</li>
+          </ul>
+        </article>
+        <article class="artifact">
+          <h3>Pushing</h3>
+          <p>If verification policy allows, the pusher creates or finds a GitLab project, writes CI config, commits generated files in batches, configures project settings, and appends an audit log entry. If an identical push already exists, it reuses the previous GitLab URL.</p>
+          <ul>
+            <li>Pushes are blocked when configured to stop on verification failure.</li>
+            <li>Project name is derived from source repo name and framework.</li>
+            <li>Audit log goes to <code>data/logs/push_audit.jsonl</code>.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section card">
+      <div class="section-title">Files and Data Artifacts</div>
+      <div class="artifact-grid">
+        <article class="artifact">
+          <h3>Checkpoint Files</h3>
+          <p>Each repo checkpoint is saved as a JSON snapshot that includes stage history and schema version.</p>
+          <div class="code-list">
+            <div class="line"><code>data/checkpoint-&lt;repo-name&gt;.json</code></div>
+          </div>
+        </article>
+        <article class="artifact">
+          <h3>Run Status</h3>
+          <p>The monitor keeps the current run summary, progress counters, and per-repo latest stage data in a central status file.</p>
+          <div class="code-list">
+            <div class="line"><code>data/evolution-status.json</code></div>
+          </div>
+        </article>
+        <article class="artifact">
+          <h3>Run Reports</h3>
+          <p>Completed runs are written into a final report file that includes totals, repo outcomes, screens, files, and estimated LLM cost.</p>
+          <div class="code-list">
+            <div class="line"><code>data/report-&lt;run-id&gt;.json</code></div>
+          </div>
+        </article>
+        <article class="artifact">
+          <h3>Clone Cache</h3>
+          <p>Source extraction results can be reused per repo URL and commit SHA.</p>
+          <div class="code-list">
+            <div class="line"><code>data/clone-cache/&lt;cache-key&gt;.json</code></div>
+          </div>
+        </article>
+        <article class="artifact">
+          <h3>Push Audit</h3>
+          <p>GitLab pushes are recorded as append-only audit entries and also serve as the lookup source for push deduplication.</p>
+          <div class="code-list">
+            <div class="line"><code>data/logs/push_audit.jsonl</code></div>
+          </div>
+        </article>
+        <article class="artifact">
+          <h3>Verification Temp Output</h3>
+          <p>Verification materializes generated files into a temp directory and writes a verification report into a hidden pipeline directory when possible.</p>
+          <div class="code-list">
+            <div class="line"><code>&lt;tmp-project&gt;/.pipeline/verification-report.json</code></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section card">
+      <div class="section-title">Entry Points and Interfaces</div>
+      <div class="endpoint-grid">
+        <article class="endpoint">
+          <h3>CLI Commands</h3>
+          <ul>
+            <li><code>python -m pipeline run --manifests ...</code></li>
+            <li><code>python -m pipeline run-single --repo user/name</code></li>
+            <li><code>python -m pipeline health</code></li>
+            <li><code>python -m pipeline quality --files-dir ...</code></li>
+            <li><code>python -m pipeline api --host 0.0.0.0 --port 8000</code></li>
+          </ul>
+        </article>
+        <article class="endpoint">
+          <h3>HTTP Endpoints</h3>
+          <ul>
+            <li><code>GET /</code> root metadata</li>
+            <li><code>GET /health</code> dependency/env health</li>
+            <li><code>GET /version</code> pipeline version</li>
+            <li><code>GET /metrics</code> Prometheus export</li>
+            <li><code>GET /status</code> current run status</li>
+            <li><code>POST /run</code> batch processing</li>
+            <li><code>POST /run-single</code> one repository</li>
+            <li><code>GET /report/{run_id}</code> final report</li>
+            <li><code>GET /diagnostics/{run_id}</code> report + status + events</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section card">
+      <div class="section-title">Implemented Platform Features</div>
+      <div class="feature-grid">
+        <article class="feature">
+          <h3>Per-Run Isolation</h3>
+          <p>The API no longer mutates global config for every request. Batch size, concurrency, enabled stages, and run id are passed as per-run overrides into the orchestrator.</p>
+        </article>
+        <article class="feature">
+          <h3>Stage Journal</h3>
+          <p>Every repo records stage started, completed, and failed records with attempt and duration data, which makes resume behavior explicit instead of inferred.</p>
+        </article>
+        <article class="feature">
+          <h3>Atomic Checkpointing</h3>
+          <p>Checkpoint writes use temp-file replacement and include schema versioning for safer persistence and future migrations.</p>
+        </article>
+        <article class="feature">
+          <h3>Idempotent Side Effects</h3>
+          <p>Cloning uses commit-aware caching and pushing uses content-based deduplication backed by the audit log.</p>
+        </article>
+        <article class="feature">
+          <h3>Structured Failure Taxonomy</h3>
+          <p>Verifier failures now classify into categories like dependencies, lint, types, tests, build, timeout, and infrastructure.</p>
+        </article>
+        <article class="feature">
+          <h3>Targeted Repair</h3>
+          <p>Repair prompts now receive failure category, summary, and relevant-file hints so repairs are scoped instead of broad and generic.</p>
+        </article>
+        <article class="feature">
+          <h3>Diagnostics Endpoint</h3>
+          <p>A single diagnostics request can now return the final report, active status, and run-filtered event timeline.</p>
+        </article>
+        <article class="feature">
+          <h3>Monitoring and Cost Summary</h3>
+          <p>The monitor tracks progress, stage times, quality scores, categories, and estimated LLM cost per run.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section card">
+      <div class="section-title">Current Implementation Notes</div>
+      <div class="note-grid">
+        <article class="note">
+          <h3>Actual Mobile Targets</h3>
+          <p>The current generator and architecture model are centered on Expo and React Native. Flutter and Ionic appear in older mappings or comments, but the active implementation path is Expo / React Native.</p>
+        </article>
+        <article class="note">
+          <h3>Verification Loop Is Real</h3>
+          <p>This is not a fake quality estimate. The project writes generated files to disk and runs real package-manager and build-related commands during verification.</p>
+        </article>
+        <article class="note">
+          <h3>Version Drift Exists</h3>
+          <p>Some public strings still say version 2.0.0 while other config and newer behavior align more closely with a newer internal state of the project.</p>
+        </article>
+        <article class="note">
+          <h3>CLI and API Are Not Identical</h3>
+          <p>The API path has had more recent run-isolation improvements. The CLI still contains older configuration mutation behavior in its command wrapper code.</p>
+        </article>
+      </div>
+
+      <div class="callout">
+        <strong>Bottom Line</strong>
+        What this project actually does today is: accept repo manifests, orchestrate a durable per-repo state machine, analyze source or metadata, design a mobile architecture, generate a mobile app codebase, verify it with real commands, repair it when verification fails, score it with quality gates, and optionally publish the result to GitLab with deduplicated side effects and observable run diagnostics.
+      </div>
+    </section>
+
+    <p class="footer-note">Generated as a documentation surface for the implemented runtime behavior in this repository.</p>
+  </main>
+</body>
+</html>
