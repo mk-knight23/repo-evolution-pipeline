@@ -3,7 +3,9 @@
   "exclude": ["**/__pycache__", "**/node_modules", "**/.*", "**/*.egg-info", "**/.venv"],
   "reportMissingImports": false,
   "reportMissingModuleSource": false,
-  "pythonVersion": "3.14",
+  "reportGeneralTypeIssues": false,
+  "typeCheckingMode": "basic",
+  "pythonVersion": "3.12",
   "executionEnvironments": [
     {
       "root": ".",

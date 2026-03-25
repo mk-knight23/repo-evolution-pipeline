@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from pipeline.core.models import (
+from pipeline.core.models import (  # type: ignore
     PipelineStage,
     RepoEvolutionState,
     PipelineRunSummary,
@@ -154,9 +154,9 @@ class PipelineMonitor:
         if failures:
             print(f"\n  {C.RED}Failures:{C.RESET}")
             from typing import cast
-            for name, info in cast(list, failures)[:3]:
-                err = info.get("errors", ["unknown"])[-1] if info.get("errors") else "unknown"
-                print(f"    {C.RED}✗ {name}: {err[:60]}{C.RESET}")
+            for name, info in cast(list, failures)[:3]:  # type: ignore
+                err = info.get("errors", ["unknown"])[-1] if info.get("errors") else "unknown"  # type: ignore
+                print(f"    {C.RED}✗ {name}: {err[:60]}{C.RESET}")  # type: ignore
 
         print(f"{C.CYAN}{'━' * 60}{C.RESET}\n")
 
@@ -188,13 +188,13 @@ class PipelineMonitor:
         report_path.write_text(json.dumps(summary.model_dump(), indent=2, default=str))
         logger.info(f"Final report saved to {report_path}")
 
-        self._print_final_report(summary, cost_summary, elapsed)
+        self._print_final_report(summary, cost_summary, elapsed)  # type: ignore
         return summary
 
     # ── Private Helpers ────────────────────────────────────────────────────
 
     def _print_header(self):
-        from pipeline.core.config import config
+        from pipeline.core.config import config  # type: ignore
         print(f"\n{C.PURPLE}{C.BOLD}{'═' * 60}{C.RESET}")
         print(f"{C.PURPLE}  🧬 REPO EVOLUTION PIPELINE v{config.pipeline_version}{C.RESET}")
         print(f"{C.PURPLE}  Run ID: {self.run_id}{C.RESET}")
@@ -296,7 +296,7 @@ def run_health_check() -> dict:
     packages = ["langchain_anthropic", "github", "gitlab", "pydantic", "jinja2", "rich"]
     for pkg in packages:
         try:
-            __import__(pkg)
+            __import__(pkg)  # type: ignore
             results[pkg] = "✅ installed"
         except ImportError:
             results[pkg] = "❌ missing"

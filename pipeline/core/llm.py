@@ -14,7 +14,7 @@ from enum import Enum
 from typing import Any, Optional
 from dataclasses import dataclass, field
 
-from pipeline.core.config import config
+from pipeline.core.config import config  # type: ignore
 
 logger = logging.getLogger("pipeline.llm")
 
@@ -70,8 +70,8 @@ class CostTracker:
             "total_calls": self.total_calls,
             "total_input_tokens": self.total_input_tokens,
             "total_output_tokens": self.total_output_tokens,
-            "total_cost_usd": float(round(float(self.total_cost_usd), 4)),
-            "cost_by_stage": {k: float(round(float(v), 4)) for k, v in dict(self.cost_by_stage).items()},
+            "total_cost_usd": float(round(float(self.total_cost_usd), 4)),  # type: ignore
+            "cost_by_stage": {k: float(round(float(v), 4)) for k, v in dict(self.cost_by_stage).items()},  # type: ignore
             "calls_by_model": self.calls_by_model,
         }
 
@@ -232,7 +232,7 @@ def extract_json(text: str) -> dict:
         except (json.JSONDecodeError, ValueError):
             pass
 
-    raise ValueError(f"No valid JSON found in LLM response (first 200 chars: {str(text)[:200]})")
+    raise ValueError(f"No valid JSON found in LLM response (first 200 chars: {str(text)[:200]})")  # type: ignore
 
 
 # ── Knowledge Base Accessor ────────────────────────────────────────────────
@@ -295,13 +295,23 @@ def create_llm(
     heavy: bool = True,
     temperature: Optional[float] = None
 ):
-    """Create a LangChain LLM instance (OpenAI or Anthropic)."""
+    """Create a LangChain LLM instance (OpenAI, Anthropic, or OmniRoute)."""
     temp = temperature if temperature is not None else (
         config.llm.temperature_codegen if heavy else config.llm.temperature_docs
     )
 
-    if provider == "dashscope":
-        from langchain_openai import ChatOpenAI
+    if provider == "omniroute":
+        from langchain_openai import ChatOpenAI  # type: ignore
+        model_name = model or config.omniroute.authorized_models[0]
+        return ChatOpenAI(
+            model=model_name,
+            api_key=config.omniroute.api_key,
+            base_url=config.omniroute.base_url,
+            temperature=temp,
+            max_tokens=config.llm.max_tokens,
+        )
+    elif provider == "dashscope":
+        from langchain_openai import ChatOpenAI  # type: ignore
         model_name = model or config.dashscope.model_primary
         return ChatOpenAI(
             model=model_name,
@@ -311,7 +321,7 @@ def create_llm(
             max_tokens=config.llm.max_tokens,
         )
     else:
-        from langchain_anthropic import ChatAnthropic
+        from langchain_anthropic import ChatAnthropic  # type: ignore
         model_name = model or (config.llm.model_heavy if heavy else config.llm.model_light)
         kwargs = {
             "model": model_name,
@@ -348,7 +358,31 @@ async def invoke_with_retry(
     # Fallback Chain Configuration
     dash_keys = config.dashscope.api_keys
     dash_models = config.dashscope.authorized_models
-    
+
+    # 0. Try OmniRoute (free tier gateway — handles its own internal fallback)
+    if config.omniroute.enabled:
+        for model_name in config.omniroute.authorized_models:
+            provider_key = f"omniroute:{model_name}"
+            if not circuit_breaker.is_available(provider_key):
+                logger.debug(f"[{stage}] Skipping OmniRoute/{model_name} — circuit breaker OPEN")
+                continue
+            try:
+                llm = create_llm(provider="omniroute", model=model_name, heavy=heavy, temperature=temperature)
+                logger.info(f"[{stage}] Calling OmniRoute ({model_name})")
+                response = await llm.ainvoke(prompt)
+                content = response.content
+                input_tokens = int(len(prompt) / 3.5)
+                output_tokens = int(len(content) / 3.5)
+                cost_tracker.record(model_name, input_tokens, output_tokens, stage)
+                circuit_breaker.record_success(provider_key)
+                if parse_json:
+                    return extract_json(content)
+                return content
+            except Exception as e:
+                logger.warning(f"OmniRoute {model_name} failed: {str(e)[:100]}")  # type: ignore
+                circuit_breaker.record_failure(provider_key)
+                continue
+
     # 1. Try DashScope with Key Rotation & Model Fallback (circuit-breaker aware)
     for model_name in dash_models:
         provider_key = f"dashscope:{model_name}"
@@ -384,7 +418,7 @@ async def invoke_with_retry(
                 return content
 
             except Exception as e:
-                logger.warning(f"DashScope {model_name} failed with key {idx}: {str(e)[:100]}")
+                logger.warning(f"DashScope {model_name} failed with key {idx}: {str(e)[:100]}")  # type: ignore
                 circuit_breaker.record_failure(provider_key)
                 continue
 

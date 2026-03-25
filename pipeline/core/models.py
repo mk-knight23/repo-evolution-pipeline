@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, ClassVar, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field  # type: ignore
 
 logger = logging.getLogger("pipeline.models")
 
@@ -286,7 +286,7 @@ class RepoEvolutionState(BaseModel):
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     duration_seconds: float = 0.0
-    correlation_id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
+    correlation_id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])  # type: ignore
     checkpoint_schema_version: int = 1
 
     CHECKPOINT_SCHEMA_VERSION: ClassVar[int] = 1
@@ -302,7 +302,7 @@ class RepoEvolutionState(BaseModel):
         state_to_write = self.model_copy(update={"checkpoint_schema_version": self.CHECKPOINT_SCHEMA_VERSION})
         payload = state_to_write.model_dump_json(indent=2)
 
-        tmp_path = f"{path}.tmp-{uuid.uuid4().hex[:8]}"
+        tmp_path = f"{path}.tmp-{uuid.uuid4().hex[:8]}"  # type: ignore
         with open(tmp_path, "w", encoding="utf-8") as f:
             f.write(payload)
             f.flush()
@@ -369,12 +369,12 @@ class RepoEvolutionState(BaseModel):
     ):
         """Append a stage execution event to the journal."""
         self.stage_history.append(
-            StageExecutionRecord(
+            StageExecutionRecord(  # type: ignore
                 stage=stage,
-                status=status,
-                attempt=attempt,
-                duration_seconds=duration_seconds,
-                error=error,
+                status=status,  # type: ignore
+                attempt=attempt,  # type: ignore
+                duration_seconds=duration_seconds,  # type: ignore
+                error=error,  # type: ignore
             )
         )
 

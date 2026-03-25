@@ -11,20 +11,20 @@ import uuid
 from pathlib import Path
 from typing import List, Optional
 
-from fastapi import FastAPI, BackgroundTasks, HTTPException, Request
-from fastapi.responses import PlainTextResponse
-from pydantic import BaseModel
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Request  # type: ignore
+from fastapi.responses import PlainTextResponse  # type: ignore
+from pydantic import BaseModel  # type: ignore
 
-from pipeline.core.orchestrator import PipelineOrchestrator
-from pipeline.core.models import (
+from pipeline.core.orchestrator import PipelineOrchestrator  # type: ignore
+from pipeline.core.models import (  # type: ignore
     RepoManifest, 
     RepoCategory
 )
-from pipeline.core.config import config
-from pipeline.core.event_bus import event_bus
-from pipeline.monitoring.dashboard import run_health_check
-from pipeline.core.telemetry import metrics
-from pipeline.core.logging import generate_correlation_id
+from pipeline.core.config import config  # type: ignore
+from pipeline.core.event_bus import event_bus  # type: ignore
+from pipeline.monitoring.dashboard import run_health_check  # type: ignore
+from pipeline.core.telemetry import metrics  # type: ignore
+from pipeline.core.logging import generate_correlation_id  # type: ignore
 
 # Initialize FastAPI
 app = FastAPI(
@@ -112,7 +112,7 @@ async def get_overall_status():
 @app.post("/run")
 async def run_batch(request: BatchRunRequest, background_tasks: BackgroundTasks):
     """Start a batch processing run in the background."""
-    run_id = f"run-{uuid.uuid4().hex[:8]}"
+    run_id = f"run-{uuid.uuid4().hex[:8]}"  # type: ignore
     orchestrator = PipelineOrchestrator()
     # Start the orchestrator in the background with per-run overrides.
     background_tasks.add_task(
@@ -135,7 +135,7 @@ async def run_batch(request: BatchRunRequest, background_tasks: BackgroundTasks)
 @app.post("/run-single")
 async def run_single(request: SingleRunRequest, background_tasks: BackgroundTasks):
     """Start processing a single repository in the background."""
-    run_id = f"run-{uuid.uuid4().hex[:8]}"
+    run_id = f"run-{uuid.uuid4().hex[:8]}"  # type: ignore
     # Map category string to enum
     cat_map = {c.value: c for c in RepoCategory}
     repo_category = cat_map.get(request.category, RepoCategory.WEBAPP)

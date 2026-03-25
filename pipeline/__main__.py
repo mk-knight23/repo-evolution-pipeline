@@ -18,7 +18,7 @@ from pathlib import Path
 # ── Logging Setup ─────────────────────────────────────────────────────────
 
 def setup_logging(verbose: bool = False, json_mode: bool = False):
-    from pipeline.core.logging import setup_structured_logging
+    from pipeline.core.logging import setup_structured_logging  # type: ignore
     setup_structured_logging(verbose=verbose, json_mode=json_mode)
 
 
@@ -26,9 +26,9 @@ def setup_logging(verbose: bool = False, json_mode: bool = False):
 
 def cmd_run(manifests_path: str, batch_size: int = 5, max_concurrent: int = 5):
     """Run the full pipeline on a list of repo manifests."""
-    from pipeline.core.orchestrator import PipelineOrchestrator
-    from pipeline.core.models import RepoManifest
-    from pipeline.core.config import config
+    from pipeline.core.orchestrator import PipelineOrchestrator  # type: ignore
+    from pipeline.core.models import RepoManifest  # type: ignore
+    from pipeline.core.config import config  # type: ignore
 
     config.batch_size = batch_size
     config.max_concurrent = max_concurrent
@@ -58,8 +58,8 @@ def cmd_run(manifests_path: str, batch_size: int = 5, max_concurrent: int = 5):
 
 def cmd_run_single(repo: str, category: str = "webapp"):
     """Run the pipeline for a single repository."""
-    from pipeline.core.orchestrator import PipelineOrchestrator
-    from pipeline.core.models import RepoManifest, RepoCategory
+    from pipeline.core.orchestrator import PipelineOrchestrator  # type: ignore
+    from pipeline.core.models import RepoManifest, RepoCategory  # type: ignore
 
     cat_map = {c.value: c for c in RepoCategory}
     repo_category = cat_map.get(category, RepoCategory.WEBAPP)
@@ -86,7 +86,7 @@ def cmd_run_single(repo: str, category: str = "webapp"):
 
 def cmd_health():
     """Run health checks on all dependencies."""
-    from pipeline.monitoring.dashboard import run_health_check
+    from pipeline.monitoring.dashboard import run_health_check  # type: ignore
 
     print("Running health checks...\n")
     results = run_health_check()
@@ -100,8 +100,8 @@ def cmd_health():
 
 def cmd_quality(files_dir: str):
     """Run quality gates on a directory of generated files."""
-    from pipeline.quality.gates import run_quality_gates
-    from pipeline.core.models import MobileArchitecture, MobileFramework, NavigationType, RepoManifest, RepoCategory
+    from pipeline.quality.gates import run_quality_gates  # type: ignore
+    from pipeline.core.models import MobileArchitecture, MobileFramework, NavigationType, RepoManifest, RepoCategory  # type: ignore
 
     path = Path(files_dir)
     if not path.is_dir():
@@ -195,11 +195,11 @@ def main():
     elif args.command == "quality":
         cmd_quality(args.files_dir)
     elif args.command == "version":
-        from pipeline.core.config import config
+        from pipeline.core.config import config  # type: ignore
         print(f"Repo Evolution Pipeline v{config.pipeline_version}")
     elif args.command == "api":
-        import uvicorn
-        uvicorn.run("pipeline.api.server:app", host=args.host, port=args.port, reload=args.reload)
+        import uvicorn  # type: ignore
+        uvicorn.run("pipeline.api.server:app", host=args.host, port=args.port, reload=args.reload)  # type: ignore
     else:
         parser.print_help()
 

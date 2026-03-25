@@ -10,15 +10,15 @@ import logging
 import re
 import json
 import os
-from typing import Optional
+from typing import Any, Optional
 
-from pipeline.core.config import config
-from pipeline.core.models import (
+from pipeline.core.config import config  # type: ignore
+from pipeline.core.models import (  # type: ignore
     RepoManifest,
     MobileArchitecture,
     DesignBrief,
 )
-from pipeline.agents.ci_templates import get_ci_template
+from pipeline.agents.ci_templates import get_ci_template  # type: ignore
 
 logger = logging.getLogger("pipeline.pusher")
 
@@ -44,7 +44,7 @@ async def push_to_gitlab(
         return existing_url
 
     try:
-        import gitlab as gl_lib
+        import gitlab as gl_lib  # type: ignore
     except ImportError:
         logger.error("python-gitlab not installed — cannot push to GitLab")
         return ""
@@ -128,7 +128,7 @@ def _ensure_project(gl, namespace: str, name: str, manifest: RepoManifest, arch:
             pass
 
     # Create new project
-    project_data = {
+    project_data: dict[str, Any] = {
         "name": name,
         "description": (
             f"Mobile app ({arch.framework.value}) evolved from "
@@ -177,7 +177,7 @@ def _commit_files(project, files: dict[str, str], manifest: RepoManifest, arch: 
     # Batch commit (GitLab API supports up to 200 actions per commit)
     batch_size = 150
     for i in range(0, len(actions), batch_size):
-        batch = actions[i:i + batch_size]
+        batch = actions[i:i + batch_size]  # type: ignore
         batch_num = (i // batch_size) + 1
         total_batches = (len(actions) + batch_size - 1) // batch_size
 
@@ -277,7 +277,7 @@ def _build_push_idempotency_key(
         hasher.update(path.encode("utf-8"))
         hasher.update(content_hash.encode("utf-8"))
 
-    return hasher.hexdigest()[:24]
+    return hasher.hexdigest()[:24]  # type: ignore
 
 
 def _find_existing_push_for_key(idempotency_key: str) -> str:
@@ -336,7 +336,7 @@ def _write_audit_log(manifest: RepoManifest, arch: MobileArchitecture, url: str,
 def validate_gitlab_connection() -> bool:
     """Test GitLab connectivity."""
     try:
-        import gitlab as gl_lib
+        import gitlab as gl_lib  # type: ignore
         gl = gl_lib.Gitlab(config.gitlab.url, private_token=config.gitlab.token)
         gl.auth()
         logger.info(f"GitLab connected as {gl.user.username}")

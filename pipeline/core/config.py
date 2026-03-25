@@ -41,6 +41,32 @@ class LLMConfig:
 
 
 @dataclass(frozen=True)
+class OmniRouteConfig:
+    """OmniRoute AI gateway configuration (OpenAI-compatible endpoint)."""
+    # Models to try in order — OmniRoute handles internal fallback per model
+    authorized_models: list[str] = field(default_factory=lambda: [
+        "if/kimi-k2-thinking",   # iFlow — unlimited, free
+        "kr/claude-sonnet-4-5",  # Kiro (AWS Builder) — unlimited Claude
+        "qw/qwen3-coder-plus",   # Qwen — unlimited, free
+        "gc/gemini-3-flash-preview",  # Gemini CLI — 1K req/day
+        "if/deepseek-r1",        # iFlow DeepSeek — unlimited
+    ])
+
+    @property
+    def base_url(self) -> str:
+        return os.environ.get("OMNIROUTE_BASE_URL", "http://localhost:20128/v1")
+
+    @property
+    def api_key(self) -> str:
+        # OmniRoute accepts any non-empty string as the API key
+        return os.environ.get("OMNIROUTE_API_KEY", "omniroute")
+
+    @property
+    def enabled(self) -> bool:
+        return os.environ.get("OMNIROUTE_ENABLED", "0").lower() in ("1", "true", "yes")
+
+
+@dataclass(frozen=True)
 class DashScopeConfig:
     """Alibaba DashScope configuration."""
     model_primary: str = "qwen3.5-plus"
@@ -124,6 +150,7 @@ class SupabaseConfig:
 class PipelineConfig:
     """Master pipeline configuration."""
     llm: LLMConfig = field(default_factory=LLMConfig)
+    omniroute: OmniRouteConfig = field(default_factory=OmniRouteConfig)
     dashscope: DashScopeConfig = field(default_factory=DashScopeConfig)
     github: GitHubConfig = field(default_factory=GitHubConfig)
     gitlab: GitLabConfig = field(default_factory=GitLabConfig)
